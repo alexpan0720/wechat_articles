@@ -1,0 +1,11 @@
+{% extends "public/base.html" %}
+{% block title %}专业洞见｜{{ site_name }}{% endblock %}
+{% block content %}
+<section class="article-index-head"><div><p class="eyebrow">INSIGHTS</p><h1>观点与洞见</h1></div><form class="search" action="/articles"><label for="q">检索文章</label><div><input id="q" name="q" value="{{ q }}" placeholder="输入关键词"><button>搜索</button></div></form></section>
+<section class="article-index section-pad">
+  <div class="result-line"><span>{{ total }} 篇文章</span>{% if q %}<span>“{{ q }}”的结果</span>{% endif %}</div>
+  {% if articles %}<div class="list-articles">{% for article in articles %}<article><time>{{ article.published_at|date }}</time><div><h2><a href="/articles/{{ article.slug }}">{{ article.title }}</a></h2><p>{{ article.summary or '' }}</p></div><a class="round-arrow" href="/articles/{{ article.slug }}" aria-label="阅读文章">↗</a></article>{% endfor %}</div>{% else %}<div class="empty-state"><p>没有找到相关文章。</p><small>试试更简短的关键词。</small></div>{% endif %}
+  {% if pages > 1 %}<nav class="pagination" aria-label="分页">{% if page > 1 %}<a href="?q={{ q|urlencode }}&page={{ page-1 }}">上一页</a>{% endif %}<span>{{ page }} / {{ pages }}</span>{% if page < pages %}<a href="?q={{ q|urlencode }}&page={{ page+1 }}">下一页</a>{% endif %}</nav>{% endif %}
+</section>
+{% endblock %}
+

@@ -1,0 +1,7 @@
+{% extends "admin/base.html" %}{% block title %}同步任务{% endblock %}{% block content %}
+<header class="admin-head"><div><p>AUTOMATION</p><h1>同步任务</h1></div><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="admin-primary">立即运行同步</button></form></header>
+{% if message %}<div class="alert success">{{ message }}</div>{% endif %}
+<section class="sync-explain"><article><span>01</span><b>发现文章</b><p>按回看窗口拉取数据源，避免延迟造成遗漏。</p></article><article><span>02</span><b>迁移与净化</b><p>下载图片、重写链接、剥离危险脚本。</p></article><article><span>03</span><b>质量门禁</b><p>正文或图片不完整时阻止自动发布。</p></article><article><span>04</span><b>幂等发布</b><p>内容哈希和来源 ID 保证不会重复。</p></article></section>
+<section class="panel"><div class="panel-head"><h2>执行记录</h2><span>最近 50 次</span></div><div class="table-wrap"><table><thead><tr><th>开始时间</th><th>触发方式</th><th>状态</th><th>成功</th><th>跳过</th><th>失败</th><th>耗时</th></tr></thead><tbody>{% for run in runs %}<tr><td>{{ run.started_at|date('%Y-%m-%d %H:%M') }}</td><td>{{ run.trigger }}</td><td><span class="status {{ run.result }}">{{ run.result }}</span></td><td>{{ run.success_count }}</td><td>{{ run.skipped_count }}</td><td>{{ run.failed_count }}</td><td>{% if run.ended_at %}{{ ((run.ended_at-run.started_at).total_seconds())|round(1) }}s{% else %}运行中{% endif %}</td></tr>{% else %}<tr><td colspan="7" class="muted">尚无执行记录</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}
+

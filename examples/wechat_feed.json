@@ -1,0 +1,29 @@
+{
+  "articles": [
+    {
+      "source": "wechat",
+      "accountId": "demo-lawfirm-account",
+      "articleId": "demo-2026-001",
+      "originalUrl": "https://mp.weixin.qq.com/s/example-001",
+      "title": "新《公司法》背景下，企业治理需要关注的三个变化",
+      "publishedAt": "2026-10-18T09:30:00+08:00",
+      "author": "衡正律师事务所",
+      "summary": "从出资责任、治理结构与董监高义务三个维度，梳理企业需要尽快完成的合规动作。",
+      "htmlContent": "<section style=\"padding: 12px 8px; color: #2c2c2c; line-height: 1.9;\"><section style=\"border-left: 4px solid #9b7741; padding-left: 18px; margin: 10px 0 28px;\"><p style=\"font-size: 22px; font-weight: bold; margin: 0;\">从规则变化到治理行动</p><p style=\"color: #777; font-size: 14px;\">企业法律实务观察 · 2026</p></section><p>新《公司法》的实施，不只是条文的更新，也对企业内部治理的真实性、规范性提出了更高要求。</p><h2 style=\"font-size: 19px; color: #28443b; margin-top: 30px;\">一、重新审视股东出资安排</h2><p>企业应核对股东出资期限、实缴情况及公开信息的一致性，避免因信息失真产生额外责任。</p><h2 style=\"font-size: 19px; color: #28443b; margin-top: 30px;\">二、完善治理结构与议事规则</h2><p>章程、股东会和董事会议事规则应与企业实际运行方式相匹配，并形成完整、可追溯的决策记录。</p><h2 style=\"font-size: 19px; color: #28443b; margin-top: 30px;\">三、关注董监高责任边界</h2><p>建议结合岗位职责建立利益冲突申报、关联交易审查和重大事项法律评估机制。</p><section style=\"background: #f2eee5; padding: 20px; margin-top: 30px;\"><strong>提示</strong><br>本文仅作一般性信息分享，不构成对具体事项的法律意见。</section></section>",
+      "assets": []
+    },
+    {
+      "source": "wechat",
+      "accountId": "demo-lawfirm-account",
+      "articleId": "demo-2026-002",
+      "originalUrl": "https://mp.weixin.qq.com/s/example-002",
+      "title": "商业合同审查：比风险清单更重要的五个问题",
+      "publishedAt": "2026-10-19T16:00:00+08:00",
+      "author": "衡正律师事务所",
+      "summary": "高质量合同审查的目标不是发现最多的问题，而是帮助交易安全、清晰地落地。",
+      "htmlContent": "<section style=\"font-size: 16px; line-height: 2; color: #333; padding: 8px;\"><p style=\"font-size: 30px; line-height: 1.45; color: #172a25; font-weight: bold;\">合同审查的起点，<br><span style=\"color: #9a493e;\">是理解交易。</span></p><p>面对一份商业合同，逐条挑错并不困难。真正重要的是识别哪些条款会改变交易结果。</p><table style=\"width: 100%; border-collapse: collapse; margin: 25px 0;\"><tbody><tr><td style=\"border: 1px solid #d8d2c5; padding: 14px;\"><strong>01</strong><br>交易目的是什么？</td><td style=\"border: 1px solid #d8d2c5; padding: 14px;\"><strong>02</strong><br>谁承担核心义务？</td></tr><tr><td style=\"border: 1px solid #d8d2c5; padding: 14px;\"><strong>03</strong><br>验收标准是否客观？</td><td style=\"border: 1px solid #d8d2c5; padding: 14px;\"><strong>04</strong><br>退出机制是否可执行？</td></tr></tbody></table><p>第五个问题是：当最坏情形发生时，证据是否足以支持预设的救济路径？</p><blockquote style=\"margin: 28px 0; padding: 16px 22px; border-left: 3px solid #aa8144; background: #f7f4ed;\">合同不是风险的终点，而是协作规则的起点。</blockquote></section>",
+      "assets": []
+    }
+  ]
+}
+

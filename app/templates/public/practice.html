@@ -1,0 +1,16 @@
+{% extends "public/base.html" %}
+{% block title %}专业领域｜{{ site_name }}{% endblock %}
+{% block content %}
+<section class="page-hero compact"><p class="eyebrow">PRACTICE AREAS</p><h1>聚焦问题，<br><em>抵达解决。</em></h1></section>
+<section class="service-stack section-pad">
+  {% set services = [
+    ('01','公司与商事','公司治理、投融资、并购重组、合同体系与常年法律顾问'),
+    ('02','争议解决','商事诉讼、仲裁、执行及复杂争议的全流程管理'),
+    ('03','知识产权','商标、著作权、商业秘密保护与知识产权争议'),
+    ('04','劳动与合规','用工制度、劳动争议、内部调查与企业合规体系'),
+    ('05','数据与科技','数据合规、网络安全、平台治理与科技业务法律支持'),
+    ('06','财富与家事','家族财富传承、婚姻家事及私人客户综合法律服务') ] %}
+  {% for no, name, desc in services %}<article><b>{{ no }}</b><h2>{{ name }}</h2><p>{{ desc }}</p><span>↗</span></article>{% endfor %}
+</section>
+{% endblock %}
+

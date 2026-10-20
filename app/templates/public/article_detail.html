@@ -1,0 +1,12 @@
+{% extends "public/base.html" %}
+{% block title %}{{ article.title }}｜{{ site_name }}{% endblock %}
+{% block description %}{{ article.summary or article.title }}{% endblock %}
+{% block head %}<link rel="canonical" href="{{ request.url }}"><meta property="og:type" content="article"><meta property="og:title" content="{{ article.title }}"><meta property="article:published_time" content="{{ article.published_at.isoformat() }}">{% endblock %}
+{% block content %}
+<article class="article-page">
+  <header><a class="back-link" href="/articles">← 返回全部文章</a><p class="eyebrow">PROFESSIONAL INSIGHT</p><h1>{{ article.title }}</h1><div class="article-meta"><span>{{ article.published_at|date }}</span>{% if article.author %}<span>{{ article.author }}</span>{% endif %}<a href="{{ article.source_url }}" target="_blank" rel="noopener noreferrer">查看原文 ↗</a></div></header>
+  <div class="article-frame-wrap"><iframe title="{{ article.title }}正文" src="/articles/{{ article.slug }}/content" sandbox loading="eager"></iframe></div>
+  <footer><p>本文内容仅供一般参考，不构成针对任何具体事项的法律意见。</p><a href="/contact">就相关问题联系我们 →</a></footer>
+</article>
+{% endblock %}
+
