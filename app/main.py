@@ -17,16 +17,22 @@ from app.config import get_settings
 from app.content import article_document, sanitize_article_html
 from app.database import get_db, init_db
 from app.dependencies import build_adapter
-from app.models import AdminProfile, Article, ArticleStatus, ArticleVersion, SyncRun, utcnow
+from app.models import (
+    AdminProfile, Article, ArticleAsset, ArticleStatus, ArticleVersion, SourceAccount, SyncRun,
+    utcnow,
+)
 from app.security import (
     ensure_csrf_token, hash_password, require_admin, verify_csrf, verify_password,
 )
+from app.sync.adapters import SingleArticleAdapter
 from app.sync.service import SyncService
+from app.sync.wechat import WechatFetchError, WechatUrlFetcher
 
 
 settings = get_settings()
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+settings.storage_dir.mkdir(parents=True, exist_ok=True)
 
 
 def format_date(value: datetime | None, fmt: str = "%Y年%m月%d日") -> str:
@@ -38,6 +44,7 @@ templates.env.filters["date"] = format_date
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    settings.validate_production()
     init_db()
     settings.storage_dir.mkdir(parents=True, exist_ok=True)
     yield
@@ -250,6 +257,58 @@ def admin_dashboard(request: Request, db: Session = Depends(get_db)):
     ))
 
 
+@app.get("/admin/import", response_class=HTMLResponse)
+def admin_import_page(request: Request):
+    require_admin(request)
+    return templates.TemplateResponse(
+        request, "admin/import.html",
+        admin_context(request, error=None, submitted_url=""),
+    )
+
+
+@app.post("/admin/import", response_class=HTMLResponse)
+def admin_import_wechat(
+    request: Request,
+    wechat_url: str = Form(...),
+    csrf_token: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    require_admin(request)
+    verify_csrf(request, csrf_token)
+    submitted_url = wechat_url.strip()
+    try:
+        source = WechatUrlFetcher().fetch(submitted_url)
+        draft_settings = settings.model_copy(update={"auto_publish": False})
+        summary = SyncService(
+            db, SingleArticleAdapter(source), draft_settings
+        ).run(trigger="wechat-url-import")
+        account = db.scalar(select(SourceAccount).where(
+            SourceAccount.account_identifier == source.account_id
+        ))
+        article = db.scalar(select(Article).where(
+            Article.source_account_id == account.id,
+            Article.source_article_id == source.article_id,
+        )) if account else None
+        if not article:
+            raise WechatFetchError("文章已下载，但没有成功生成草稿，请查看同步日志")
+        result = "failed" if summary.failed else "ready"
+        return RedirectResponse(
+            f"/admin/articles/{article.id}?imported={result}", status_code=303
+        )
+    except WechatFetchError as exc:
+        return templates.TemplateResponse(
+            request, "admin/import.html",
+            admin_context(request, error=str(exc), submitted_url=submitted_url),
+            status_code=400,
+        )
+    except Exception as exc:
+        return templates.TemplateResponse(
+            request, "admin/import.html",
+            admin_context(request, error=f"导入失败：{exc}", submitted_url=submitted_url),
+            status_code=500,
+        )
+
+
 @app.get("/admin/articles", response_class=HTMLResponse)
 def admin_articles(
     request: Request,
@@ -276,7 +335,11 @@ def admin_article_edit(article_id: str, request: Request, db: Session = Depends(
         ArticleVersion.article_id == article.id
     ).order_by(desc(ArticleVersion.version))).all()
     return templates.TemplateResponse(request, "admin/article_edit.html", admin_context(
-        request, article=article, versions=versions, saved=request.query_params.get("saved")
+        request,
+        article=article,
+        versions=versions,
+        saved=request.query_params.get("saved"),
+        imported=request.query_params.get("imported"),
     ))
 
 
@@ -321,6 +384,18 @@ def admin_article_status(
     article = db.get(Article, article_id)
     if not article:
         raise HTTPException(status_code=404, detail="文章不存在")
+    if target == ArticleStatus.published.value:
+        failed_assets = db.scalar(select(func.count()).select_from(ArticleAsset).where(
+            ArticleAsset.article_id == article.id,
+            ArticleAsset.status == "failed",
+        )) or 0
+        if article.failure_reason or failed_assets:
+            raise HTTPException(
+                status_code=422,
+                detail="文章仍有图片下载失败记录，不能发布不完整内容",
+            )
+        if not article.content_html.strip():
+            raise HTTPException(status_code=422, detail="正文为空，不能发布")
     article.status = target
     article.updated_at = utcnow()
     db.commit()
@@ -366,7 +441,7 @@ def bootstrap_admin(
     """One-time guarded bootstrap for deployments without shell access."""
     if db.scalar(select(func.count()).select_from(AdminProfile)):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="管理员已存在")
-    if token != settings.secret_key:
+    if settings.secret_key == "development-secret-change-before-production" or token != settings.secret_key:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无效令牌")
     if len(password) < 12:
         raise HTTPException(status_code=422, detail="密码至少需要12个字符")

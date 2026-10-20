@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.app_env.lower() == "production"
 
+    def validate_production(self) -> None:
+        if self.is_production and self.secret_key == "development-secret-change-before-production":
+            raise RuntimeError("SECRET_KEY must be changed before production startup")
+        if self.is_production and len(self.secret_key) < 32:
+            raise RuntimeError("SECRET_KEY must contain at least 32 characters in production")
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}{% block title %}导入微信文章{% endblock %}{% block content %}
+<header class="admin-head import-head"><div><p>MANUAL IMPORT</p><h1>从微信链接导入</h1></div><a href="/admin/articles">查看文章库 →</a></header>
+<section class="import-shell">
+  <div class="import-main">
+    <div class="import-intro"><span class="import-number">01</span><div><h2>粘贴微信公众号文章链接</h2><p>系统会下载原始正文和图片，保留安全的秀米内联样式，并先保存为草稿。不会未经确认直接发布。</p></div></div>
+    {% if error %}<div class="alert error"><b>没有完成导入</b><br>{{ error }}</div>{% endif %}
+    <form class="url-import-form" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="wechat_url">微信文章链接</label>
+      <div class="url-field"><span>↗</span><input id="wechat_url" name="wechat_url" type="url" required autofocus value="{{ submitted_url }}" placeholder="https://mp.weixin.qq.com/s/……" pattern="https://mp\.weixin\.qq\.com/s.*"><button class="admin-primary">下载并生成草稿</button></div>
+      <small>仅支持 https://mp.weixin.qq.com/s/ 开头的公众号文章链接</small>
+    </form>
+    <div class="import-wait"><b>下载通常需要 5–30 秒</b><p>提交后请保持页面打开。包含大量图片的长文章可能需要更久。</p></div>
+  </div>
+  <aside class="import-rail">
+    <p class="rail-label">IMPORT PIPELINE</p>
+    <ol><li><b>读取微信正文</b><span>标题、作者、发布时间和 js_content</span></li><li><b>迁移图片资源</b><span>下载到网站自有存储并重写链接</span></li><li><b>安全处理排版</b><span>保留样式，移除脚本和事件属性</span></li><li><b>保存待发布草稿</b><span>人工确认后再公开到官网</span></li></ol>
+    <div class="security-note"><span>安全边界</span><p>该入口只访问微信文章域名，抓取到的脚本不会在官网执行。</p></div>
+  </aside>
+</section>
+{% endblock %}

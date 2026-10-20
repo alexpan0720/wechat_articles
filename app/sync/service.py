@@ -51,6 +51,8 @@ class SyncService:
                 outcome, article_id = self._sync_one(source)
                 if outcome == "skipped":
                     run.skipped_count += 1
+                elif outcome == "failed":
+                    run.failed_count += 1
                 else:
                     run.success_count += 1
                 self.db.add(SyncItem(
@@ -112,6 +114,11 @@ class SyncService:
         cleaned_html = sanitize_article_html(migrated_html)
         if not cleaned_html.strip() or not text_excerpt(cleaned_html, 20).strip():
             raise ValueError("article body is empty after sanitization")
+        if failures and article and article.status == ArticleStatus.published.value:
+            details = "; ".join(item.error or "unknown asset error" for item in failures)
+            raise ValueError(
+                f"new version failed asset validation; existing published version preserved: {details}"
+            )
 
         if not article:
             candidate = slugify(source.title, fallback=source.article_id)

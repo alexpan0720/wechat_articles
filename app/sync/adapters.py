@@ -50,6 +50,17 @@ class ArticleSourceAdapter(ABC):
         return True
 
 
+class SingleArticleAdapter(ArticleSourceAdapter):
+    """Adapter used by the authenticated manual URL-import workflow."""
+
+    def __init__(self, article: SourceArticle):
+        self.article = article
+
+    def list_articles(self, lookback_days: int = 30) -> list[SourceArticle]:
+        del lookback_days
+        return [self.article]
+
+
 class FileArticleSourceAdapter(ArticleSourceAdapter):
     """Deterministic adapter for demos, migrations, fixtures and contract testing."""
 
